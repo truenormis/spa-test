@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Requests\StoreReplyRequest;
 use App\Models\File;
 use App\Models\Reply;
+use Illuminate\Support\Facades\Cache;
 use Intervention\Image\Facades\Image;
 
 class ReplyService
@@ -31,7 +32,7 @@ class ReplyService
                 'comment' => $validated['reply'],
             ]);
         }
-
+        Cache::forget('home_page');
         $this->fileStore($request, $reply);
     }
 
@@ -45,21 +46,34 @@ class ReplyService
     {
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-                $filename = uniqid() . '_' . $file->getClientOriginalName();
-//                $file->storeAs('public/images', $filename);
-                $img = Image::make($file);
-                $img->resize(320, 240, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
+                // Проверка типа файла
+                if (strpos($file->getMimeType(), 'image') !== false) {
+                    // Если файл является изображением
+                    $filename = uniqid() . '_' . $file->getClientOriginalName();
+                    $img = Image::make($file);
+                    $img->resize(320, 240, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
 
-                $fileRecord = File::create([
-                    'path' => $filename,
-                    'reply_id' => $reply->id,
-                ]);
+                    $fileRecord = File::create([
+                        'path' => $filename,
+                        'reply_id' => $reply->id,
+                    ]);
 
-                $img->save(storage_path('/app/public/images/') . $filename);
+                    $img->save(storage_path('/app/public/images/') . $filename);
+                } else {
+                    // Если файл не является изображением, просто сохраните его
+                    $filename = uniqid() . '_' . $file->getClientOriginalName();
+                    $file->storeAs('public/images', $filename);
+
+                    $fileRecord = File::create([
+                        'path' => $filename,
+                        'reply_id' => $reply->id,
+                    ]);
+                }
             }
         }
+
     }
 
 }

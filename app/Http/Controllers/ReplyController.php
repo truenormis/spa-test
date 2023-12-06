@@ -6,6 +6,7 @@ use App\Http\Requests\StoreReplyRequest;
 use App\Models\File;
 use App\Models\Reply;
 use App\Services\ReplyService;
+use Illuminate\Support\Facades\Cache;
 use Intervention\Image\Facades\Image;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -14,13 +15,18 @@ class ReplyController extends Controller
     public function index()
     {
         //$replies = Reply::where('parent_id', null)->paginate(25);
-        $replies = QueryBuilder::for(Reply::class)
-            ->defaultSort('-id')
-            ->allowedSorts('name', 'email','id')
-            ->where('parent_id',null)
-            ->paginate(25)
-            ->appends(request()->query());
-        return view('home')->with('replies', $replies);
+        $cacheKey = 'home_page';
+
+        $replies = Cache::remember($cacheKey, now()->addMinutes(10), function () {
+            return QueryBuilder::for(Reply::class)
+                ->defaultSort('-id')
+                ->allowedSorts('name', 'email', 'id')
+                ->where('parent_id', null)
+                ->paginate(25)
+                ->appends(request()->query());
+        });
+
+        return view('home')->with('replies',$replies);
     }
 
     public function store(StoreReplyRequest $request)

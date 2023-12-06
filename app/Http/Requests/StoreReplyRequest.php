@@ -24,43 +24,41 @@ class StoreReplyRequest extends FormRequest
         $allowedTags = '<a><code><i><strong><q>'; // Замените это на список разрешенных тегов
 
         return [
-            'name' => "required|string|max:255",
-            'email' => "required|email|max:255",
+            'name' => ['required', 'string', 'max:255', 'regex:/^[^<>]*$/'],
+            'email' => ['required', 'email', 'max:255', 'regex:/^[^<>]*$/'],
             'reply' => [
                 'required',
                 'string',
                 'max:500',
                 function ($attribute, $value, $fail) use ($allowedTags) {
-                    // Удаление всех тегов, кроме разрешенных
                     $filteredValue = strip_tags($value, $allowedTags);
 
-                    // Проверка, изменилось ли значение после фильтрации
                     if ($value !== $filteredValue) {
-                        $fail($attribute . ' содержит недопустимые теги.');
+                        $fail('has incorrect tags');
                     }
                 },
             ],
             'files' => [
                 'array',
-                'max:5', // Максимальное количество файлов
+                'max:5',
                 function ($attribute, $value, $fail) {
                     foreach ($value as $file) {
                         if (!$file->isValid()) {
-                            $fail('Один из файлов не является допустимым файлом.');
+                            $fail('One of the files is not a valid file.');
                         }
 
                         $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png', 'txt'];
                         $extension = strtolower($file->getClientOriginalExtension());
 
                         if (!in_array($extension, $allowedExtensions)) {
-                            $fail('Один из файлов имеет недопустимое расширение.');
+                            $fail('One of the files has an invalid extension.');
                         }
 
                         if ($extension === 'txt') {
-                            // Если файл - текстовый, не должен весить больше 100 КБ
-                            $maxSize = 100 * 1024; // 100 КБ в байтах
+
+                            $maxSize = 100 * 1024;
                             if ($file->getSize() > $maxSize) {
-                                $fail('Текстовый файл не должен превышать 100 КБ.');
+                                $fail('Text file should not exceed 100 KB.');
                             }
                         }
                     }
