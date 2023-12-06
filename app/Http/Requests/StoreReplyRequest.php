@@ -67,7 +67,7 @@ class StoreReplyRequest extends FormRequest
                 },
             ],
             'files.*' => 'max:12288',
-            'captcha' => 'required|captcha'
+            'captcha' => 'required'
 
         ];
     }
