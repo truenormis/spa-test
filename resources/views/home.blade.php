@@ -142,10 +142,10 @@
 
 
 
-@vite(['resources/js/replyform.js'])
-@vite(['resources/js/venobox.min.js'])
-@vite(['resources/css/venobox.min.css'])
-@vite(['resources/js/image.js'])
+{{--@vite(['resources/js/replyform.js'])--}}
+{{--@vite(['resources/js/venobox.min.js'])--}}
+{{--@vite(['resources/css/venobox.min.css'])--}}
+{{--@vite(['resources/js/image.js'])--}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 </body>
 </html>
