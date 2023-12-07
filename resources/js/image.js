@@ -1,3 +1,4 @@
+import VenoBox from "venobox";
 new VenoBox({
     selector: '.my-image-links',
     numeration: true,
