@@ -44,6 +44,8 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
+    'telegram_token' => env('TELEGRAM_BOT_TOKEN'),
+    'telegram_chat_id' => env('TELEGRAM_CHAT_ID'),
     /*
     |--------------------------------------------------------------------------
     | Application URL

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\ReplyEvent;
 use App\Http\Requests\StoreReplyRequest;
 use App\Models\File;
 use App\Models\Reply;
@@ -32,6 +33,7 @@ class ReplyService
                 'comment' => $validated['reply'],
             ]);
         }
+        event(new ReplyEvent($reply));
         Cache::forget('home_page');
         $this->fileStore($request, $reply);
     }
